@@ -24,6 +24,11 @@ class SauceDemoTest:
         print("Logging in works fine.")
         return True
 
+    def items_displayed(self):
+        assert self.driver.find_elements(By.CSS_SELECTOR, "div[class='inventory_item']"), "Cannot display items."
+        print("Items displayed correctly.")
+        return 6 == len(self.driver.find_elements(By.CSS_SELECTOR, "div[class='inventory_item']"))
+
     def sort_things_a_z(self):
         select = Select(self.driver.find_element(By.CSS_SELECTOR, "select[class='product_sort_container']"))
         select.select_by_value("az")
@@ -31,7 +36,7 @@ class SauceDemoTest:
                          self.driver.find_elements(By.CSS_SELECTOR, "div[class='inventory_item_name']")]
         product_names_sorted = product_names[::]
         product_names_sorted.sort()
-        assert product_names == product_names_sorted
+        assert product_names == product_names_sorted, "Sorting things a-z return incorrect values."
         print("Sorting A-Z works fine.")
         return True
 
@@ -45,16 +50,32 @@ class SauceDemoTest:
                          self.driver.find_elements(By.CSS_SELECTOR, "div[class='inventory_item_price']")]
         product_prices_sorted = self.product_prices[::]
         product_prices_sorted.sort()
-        try:
-            assert product_prices_sorted[::-1] == self.product_prices, "Sorting by price (high to low) doesnt work"
-            print("Sorting by price works fine.")
-            return True
-        except AssertionError:
-            print("Sorting by price (high to low) doesnt work")
-            return False
+        assert product_prices_sorted[::-1] == self.product_prices, "Sorting by price (high to low) doesnt work"
+        print("Sorting by price works fine.")
+        return True
+
+    def add_item_to_cart(self):
+        self.driver.find_element(By.ID, "add-to-cart-sauce-labs-bolt-t-shirt").click()
+        self.driver.find_element(By.ID, "shopping_cart_container").click()
+        assert "Sauce Labs Bolt T-Shirt" in self.driver.find_element(By.CSS_SELECTOR, "div[class='cart_item_label']").text, "No item in cart"
+        print("Item correctly added to cart")
+        return True
+
+    #only after "add to cart" func
+    def remove_from_cart(self):
+        self.driver.find_element(By.ID, "remove-sauce-labs-bolt-t-shirt").click()
+        assert self.driver.find_element(By.CSS_SELECTOR, "div[class='removed_cart_item']"), "No items removed."
+        print("Item removed correctly.")
+        #after the test is passed, return to mainpage
+        self.driver.find_element(By.ID, "continue-shopping").click()
+        return True
 
 
-sauce_obj = SauceDemoTest()
-sauce_obj.log_into()
-sauce_obj.sort_things_a_z()
-sauce_obj.sort_things_price_high_to_low()
+if __name__ == "__main__":
+    sauce_obj = SauceDemoTest()
+    sauce_obj.log_into()
+    sauce_obj.items_displayed()
+    sauce_obj.sort_things_a_z()
+    sauce_obj.sort_things_price_high_to_low()
+    sauce_obj.add_item_to_cart()
+    sauce_obj.remove_from_cart()
