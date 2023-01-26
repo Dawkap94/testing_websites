@@ -13,15 +13,15 @@ def screenshot_on_error(func):
             func(*args, **kwargs)
         except Exception as exc_name:
             now = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-            args[0].driver.save_screenshot(f"Error{now}.png")
-            print("An error occured.")
+            args[0].driver.save_screenshot(f"{func.__name__}Error{now}.png")
+            print(f"An error with {func.__name__} occured.")
             raise exc_name
     return wrapper
 
 
 class SauceDemoTest:
     def __init__(self):
-        self.login = "problem_user"  # logins in use: locked_out_user, problem_user and performance_glitch_user
+        self.login = "standard_user"  # logins in use: locked_out_user, problem_user and performance_glitch_user
         self.password = "secret_sauce"
         self.service_obj = Service('C://Dev//chromedriver.exe')
         self.driver_options = webdriver.ChromeOptions()
