@@ -4,6 +4,7 @@ from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.support.ui import Select
 from selenium import webdriver
 from datetime import datetime
+from decimal import Decimal
 
 
 # screenshot decorator
@@ -95,9 +96,27 @@ class SauceDemoTest:
         self.driver.find_element(By.ID, "remove-sauce-labs-bolt-t-shirt").click()
         assert self.driver.find_element(By.CSS_SELECTOR, "div[class='removed_cart_item']"), "Cannot remove item " \
                                                                                             "from cart."
-        print("Item removed correctly.")
-        # after the test is passed, return to mainpage
+        print("Item removed from cart correctly.")
+        # after the test is passed, return to home page
         self.driver.find_element(By.ID, "continue-shopping").click()
+        return True
+
+    @screenshot_on_error
+    def proceed_to_checkout(self):
+        self.driver.find_element(By.ID, "checkout").click()
+        assert self.driver.find_element(By.ID, "first-name"), "Cannot proceed checkout"
+        self.driver.find_element(By.ID, "first-name").send_keys("Examplefirstname")
+        self.driver.find_element(By.ID, "last-name").send_keys("Examplesecondname")
+        self.driver.find_element(By.ID, "postal-code").send_keys("30-300")
+        self.driver.find_element(By.ID, "continue").click()
+        assert self.driver.find_element(By.CSS_SELECTOR, "div[class='summary_info']"), "Cannot proceed order form"
+        subtotal = Decimal(self.driver.find_element(By.CSS_SELECTOR, "div[class='summary_subtotal_label']").text.split("$")[1])
+        tax = Decimal(self.driver.find_element(By.CSS_SELECTOR, "div[class='summary_tax_label']").text.split("$")[1])
+        total = Decimal(self.driver.find_element(By.CSS_SELECTOR, "div[class='summary_total_label']").text.split("$")[1])
+        assert subtotal + tax == total, "Total price is incorrect"
+        self.driver.find_element(By.ID, "finish").click()
+        assert "THANK YOU FOR YOUR ORDER" in self.driver.find_element(By.ID, "checkout_complete_container").text
+        print("Order completed")
         return True
 
     @staticmethod
@@ -115,4 +134,6 @@ if __name__ == "__main__":
         sauce_obj.sort_things_price_high_to_low()
         sauce_obj.add_item_to_cart()
         sauce_obj.remove_from_cart()
+        sauce_obj.add_item_to_cart()
+        sauce_obj.proceed_to_checkout()
         status = sauce_obj.finish()
