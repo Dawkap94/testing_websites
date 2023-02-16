@@ -17,6 +17,7 @@ def screenshot_on_error(func):
             args[0].driver.save_screenshot(f"{func.__name__}Error{now}.png")
             print(f"An error with {func.__name__} occured.")
             raise exc_name
+
     return wrapper
 
 
@@ -24,9 +25,9 @@ class SauceDemoTest:
     def __init__(self):
         self.login = "standard_user"  # logins in use: locked_out_user, problem_user and performance_glitch_user
         self.password = "secret_sauce"
-        self.service_obj = Service('C://Dev//chromedriver.exe')
+        self.service_obj = Service('C://Dev//chromedriver.exe')  # path to your chrome webdriver
         self.driver_options = webdriver.ChromeOptions()
-        self.driver_options.add_argument('--headless')
+        self.driver_options.add_argument('--headless') # testing works in background
         self.driver = webdriver.Chrome(service=self.service_obj, options=self.driver_options)
         self.driver.get('https://www.saucedemo.com/')
         self.driver.implicitly_wait(3)
@@ -110,9 +111,11 @@ class SauceDemoTest:
         self.driver.find_element(By.ID, "postal-code").send_keys("30-300")
         self.driver.find_element(By.ID, "continue").click()
         assert self.driver.find_element(By.CSS_SELECTOR, "div[class='summary_info']"), "Cannot proceed order form"
-        subtotal = Decimal(self.driver.find_element(By.CSS_SELECTOR, "div[class='summary_subtotal_label']").text.split("$")[1])
+        subtotal = Decimal(
+            self.driver.find_element(By.CSS_SELECTOR, "div[class='summary_subtotal_label']").text.split("$")[1])
         tax = Decimal(self.driver.find_element(By.CSS_SELECTOR, "div[class='summary_tax_label']").text.split("$")[1])
-        total = Decimal(self.driver.find_element(By.CSS_SELECTOR, "div[class='summary_total_label']").text.split("$")[1])
+        total = Decimal(
+            self.driver.find_element(By.CSS_SELECTOR, "div[class='summary_total_label']").text.split("$")[1])
         assert subtotal + tax == total, "Total price is incorrect"
         self.driver.find_element(By.ID, "finish").click()
         assert "THANK YOU FOR YOUR ORDER" in self.driver.find_element(By.ID, "checkout_complete_container").text

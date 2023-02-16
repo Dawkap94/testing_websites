@@ -1,12 +1,14 @@
 To complete tests in your environment make sure that you have installed:
 * Python
 * Selenium  
-* Chrome
+* Chrome  
+
 Also you can install it automatically via requirements.txt
 by typing 'pip install -r requirements.txt' in yours project terminal
 
 
-Saucedemo.com functionality tested for "standard_user":
+
+### Saucedemo.com functionality tested for username "standard_user":
 * OS: Windows 10 Pro
 * IDE: Pycharm Community Edition 2021.3
 * Python version: 3.9.13
@@ -25,7 +27,5 @@ Saucedemo.com functionality tested for "standard_user":
 | Proceeding checkout      | Works  |
 | Finishing order          | Works  |
 
-Summary:
-No bugs found for standard_user.
-
-
+### Summary:
+No bugs found for standard_user. Site works without problems.
